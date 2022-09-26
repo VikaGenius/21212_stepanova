@@ -52,7 +52,7 @@ FlatMap& FlatMap::operator=(const FlatMap& b) {
         delete[] container;
     }
     container = new Container[capacity];
-    std::copy_n(b.container, capacity, container);
+    std::copy_n(b.container, size_c, container);
     return *this;
 }
 
