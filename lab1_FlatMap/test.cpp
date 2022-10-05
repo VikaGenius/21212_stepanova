@@ -1,11 +1,8 @@
-#include "pch.h"
-#include "FlatMap.h"
+#include "FlatMap.cpp"
+#include <gtest/gtest.h>
 
-
-TEST(TestCaseName, TestName) {
-	EXPECT_EQ(1, 1);
-	EXPECT_TRUE(true);
-}
+//#include "pch.h"
+//#include "FlatMap.h"
 
 TEST(FlatMapTest, Insert) {
 	FlatMap map;
@@ -129,6 +126,50 @@ TEST(FlatMapTest, Memory) {
 	ASSERT_ANY_THROW(a.at(key2));
 	ASSERT_FALSE(a.contains(key2));
 }
+
+TEST(FlatMapTest, Operators) {
+	FlatMap a;
+
+	Key key = "RandomName";
+	Value val(139, 199);
+	a.insert(key, val);
+
+	Key key1 = "Lena";
+	Value val1(40, 52);
+	a.insert(key1, val1);
+
+	Key key2 = "Dasha";
+	Value val2(27, 90);
+	a.insert(key2, val2);
+
+	FlatMap b;
+	b.insert(key1, val1);
+	ASSERT_FALSE(a == b);
+	b = a;
+	ASSERT_TRUE(a == b);
+	ASSERT_FALSE(a != b);
+	b.clear();
+	ASSERT_FALSE(a == b);
+	ASSERT_TRUE(a[key] == val);
+
+}
+
+TEST(FlatMapTest, ConstAt) {
+	FlatMap a;
+	Key key = "ab";
+	Value val(1, 5);
+	Key key1 = "av";
+	Value val2(3, 9);
+	a.insert(key, val);
+	a.insert(key1, val2);
+
+	const FlatMap b(a);
+	ASSERT_TRUE(b.at(key).age == 1);
+	ASSERT_TRUE(b.at(key1).weight == 9);
+	ASSERT_FALSE(b.at(key) == val2);
+
+}
+
 
 int main(int argc, char** argv) {
 	::testing::InitGoogleTest(&argc, argv);

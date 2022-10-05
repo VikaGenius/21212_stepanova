@@ -1,46 +1,27 @@
-﻿// FlatMap.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-#include <algorithm>
-#include <iostream>
+﻿#include <algorithm>
 #include <cassert>
 #include <string>
-//#include <stdlib.h>
 #include "FlatMap.h"
-//#include "pch.h"
+#include <stdexcept>
 
-
-//???????????????typedef std::string Key;
-
-
- //Value::Value() = default;
-Value::Value(unsigned a, unsigned w): age(a), weight(w) {}
- //Value::~Value() = default;
-
-
-/*struct Container {
-    Key key;
-    Value value;
-};*/
+Value::Value(unsigned a, unsigned w) : age(a), weight(w) {}
 
 namespace {
     constexpr size_t kDefaultSize = 10;
 }
 
-
- FlatMap::FlatMap() {
-    capacity = kDefaultSize;
-    container = new Container[capacity]; 
-  }
+FlatMap::FlatMap(): capacity(kDefaultSize) {
+    container = new Container[capacity];
+}
 FlatMap::~FlatMap() {
     delete[] container;
 }
 
-FlatMap::FlatMap(const FlatMap & b) {
+FlatMap::FlatMap(const FlatMap& b) {
     *this = b;
 }
 FlatMap::FlatMap(FlatMap&& b) noexcept {
     *this = std::move(b);
-    // ??????????????????? проверить? что operator= &&
 }
 
 void FlatMap::swap(FlatMap& b) {
@@ -69,21 +50,17 @@ FlatMap& FlatMap::operator=(FlatMap&& b) noexcept {
         if (container != nullptr) {
             delete[] container;
         }
-
-        //container = new Container[capacity];
         container = b.container;
         b.container = nullptr;
-        //std::copy_n(b.container, size_c, container);
     }
-    return *this; 
+    return *this;
 }
-
 
 void FlatMap::clear() {
     assert(container);
     delete[] container;
     size_c = 0;
-    capacity = kDefaultSize;  
+    capacity = kDefaultSize;
     container = new Container[capacity];
 }
 
@@ -94,7 +71,7 @@ void FlatMap::memoryExpansion() {
     container = tmp;
 }
 
-size_t FlatMap::binarySearch(const Key& k) const {
+size_t FlatMap::binarySearch(const Key& k) const{
     size_t left = 0;
     size_t right = size_c;
     size_t middle = 0;
@@ -116,20 +93,19 @@ size_t FlatMap::binarySearch(const Key& k) const {
 bool FlatMap::erase(const Key& k) {
     size_t ind = binarySearch(k);
     if (ind == size_c - 1) {
-        container[ind] = { "", {0, 0}};
+        container[ind] = { "", {0, 0} };
         size_c--;
         return true;
     }
     if (container[ind].key == k) {
-        std::shift_left(container + ind, container + size_c, 1);
-        //std::copy_n(&container[ind + 1], size_c - ind - 1, &container[ind]);
+        std::copy_n(&container[ind + 1], size_c - ind - 1, &container[ind]);
         size_c--;
         return true;
     }
 
     return false;
 }
-   
+
 bool FlatMap::insert(const Key& k, const Value& v) {
     if (size_c > 0) {
         if (size_c == capacity) {
@@ -145,10 +121,9 @@ bool FlatMap::insert(const Key& k, const Value& v) {
             size_c++;
             return true;
         }
-        
+
         else {
-            std::shift_right(container + index, container + size_c + 1, 1);
-            //std::copy_n(container + index, size_c - index, container + index + 1);
+            std::copy_backward(container + index, container + size_c, container + size_c + 1);
             container[index] = { k, {v.age, v.weight} };
             size_c++;
             return true;
@@ -158,7 +133,7 @@ bool FlatMap::insert(const Key& k, const Value& v) {
         container[0] = { k, {v.age, v.weight} };
         size_c++;
         return true;
-            
+
     }
 }
 bool FlatMap::contains(const Key& k) const {
@@ -203,57 +178,28 @@ bool FlatMap::empty() const {
     return size_c == 0;
 }
 
-bool operator==(const FlatMap& a, const FlatMap& b) {
-    //return std::equal(a.container, a.container + a.size_c, b.container);
-    if (a.size_c == b.size_c) {
-        //std::equal()
-        for (size_t i = 0; i < a.size_c; i++) {
-            if (a.container[i].key == b.container[i].key &&
-                a.container[i].value.age == b.container[i].value.age &&
-                a.container[i].value.weight == b.container[i].value.weight) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
+bool operator==(const Value& a, const Value& b) {
+    if (a.age == b.age && a.weight == b.weight) {
+        return true;
     }
     return false;
-  
 }
+
+bool operator==(const Container& a, const Container& b) {
+    if (a.key == b.key && a.value == b.value) {
+        return true;
+    }
+    return false;
+}
+
+bool operator==(const FlatMap& a, const FlatMap& b) {
+    if (a.size_c == b.size_c) {
+        return std::equal(a.container, a.container + a.size_c, b.container);
+    }
+    return false;
+}
+
 bool operator!=(const FlatMap& a, const FlatMap& b) {
     return !(a == b);
 }
-
-
-
-/*
-int main()
-{
-    /*FlatMap a;
-
-    Key key = "Vika";
-    Value value(18, 57);
-    a.insert(key, value);
- 
-    Key key1 = "Armina";
-    Value value1(19, 47);
-    a.insert(key1, value1);
-
-    Key key2 = "Yana";
-    Value value2(90, 50);
-    a.insert(key2, value2);
-
-    Value v3 = a.at(key2);*/
-    //std::cout << v3.age;
-    /*if (a.erase(key) == true) {
-        std::cout << a.size();
-    }
-    else {
-        std::cout << "loh";
-        }*
-    
-
-
-}*/
 
