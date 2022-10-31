@@ -1,24 +1,20 @@
 ﻿#pragma once
+#include <string>
+
 typedef std::string Key;
 
 struct Value {
 	unsigned age = 0;
 	unsigned weight = 0; 
-	Value() = default;
+	Value();
 	Value(unsigned a, unsigned w);
 	~Value() = default;
 	friend bool operator==(const Value& a, const Value& b);
 };
 
-struct Container {
-	Key key;
-	Value value;
-	friend bool operator==(const Container& a, const Container& b);
-};
-
 class FlatMap
 {
-public:
+public:	
 	//Constructor
 	//Creates an object, allocates memory
 	FlatMap();
@@ -33,13 +29,6 @@ public:
 
 	// Swap the values ​​of two FlatMap
 	void swap(FlatMap& b);
-
-	//Allocates additional memory for an already created dynamic array
-	void memoryExpansion();
-
-	//Binary search. Determines by key where the element should be in the container
-	//O(log(n))
-	size_t binarySearch(const Key& k) const;
 
 	//Assignment operator for this class
 	FlatMap& operator=(const FlatMap& b);
@@ -82,6 +71,20 @@ public:
 	friend bool operator!=(const FlatMap& a, const FlatMap& b);
 
 private:
+	struct Container {
+		Key key;
+		Value value;
+		//friend bool operator==(const FlatMap::Container& a, const FlatMap::Container& b);
+	};
+	friend bool operator==(const FlatMap::Container& a, const FlatMap::Container& b);
+	//Allocates additional memory for an already created dynamic array
+	void memoryExpansion();
+
+	//Binary search. Determines by key where the element should be in the container
+	//O(log(n))
+	size_t binarySearch(const Key& k) const;
+
+
 	Container* container = nullptr;
 	size_t size_c = 0ull;
 	size_t capacity = 0ull;

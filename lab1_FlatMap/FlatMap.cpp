@@ -1,13 +1,16 @@
-﻿#include <algorithm>
+﻿#include "FlatMap.h"
+
+#include <algorithm>
 #include <cassert>
 #include <string>
-#include "FlatMap.h"
 #include <stdexcept>
 
 Value::Value(unsigned a, unsigned w) : age(a), weight(w) {}
+Value::Value() : age(0), weight(0) {}
 
 namespace {
     constexpr size_t kDefaultSize = 10;
+    constexpr size_t kDefaultSizeMult = 2;
 }
 
 FlatMap::FlatMap(): capacity(kDefaultSize) {
@@ -52,6 +55,8 @@ FlatMap& FlatMap::operator=(FlatMap&& b) noexcept {
         }
         container = b.container;
         b.container = nullptr;
+        b.size_c = 0;
+        b.capacity = 0;
     }
     return *this;
 }
@@ -109,7 +114,7 @@ bool FlatMap::erase(const Key& k) {
 bool FlatMap::insert(const Key& k, const Value& v) {
     if (size_c > 0) {
         if (size_c == capacity) {
-            capacity *= 2;
+            capacity *= kDefaultSizeMult;  
             memoryExpansion();
         }
         size_t index = binarySearch(k);
@@ -133,15 +138,10 @@ bool FlatMap::insert(const Key& k, const Value& v) {
         container[0] = { k, {v.age, v.weight} };
         size_c++;
         return true;
-
     }
 }
 bool FlatMap::contains(const Key& k) const {
-    if (container[binarySearch(k)].key == k) {
-        return true;
-    }
-
-    return false;
+    return container[binarySearch(k)].key == k;
 }
 
 Value& FlatMap::operator[](const Key& k) {
@@ -149,7 +149,9 @@ Value& FlatMap::operator[](const Key& k) {
     if (container[ind].key == k) {
         return container[ind].value;
     }
-    insert(k, Value());
+    //??/?????????????
+    Value val;
+    insert(k, val);
     return container[ind].value;
 }
 
@@ -179,17 +181,11 @@ bool FlatMap::empty() const {
 }
 
 bool operator==(const Value& a, const Value& b) {
-    if (a.age == b.age && a.weight == b.weight) {
-        return true;
-    }
-    return false;
+    return a.age == b.age && a.weight == b.weight;
 }
 
-bool operator==(const Container& a, const Container& b) {
-    if (a.key == b.key && a.value == b.value) {
-        return true;
-    }
-    return false;
+bool operator==(const FlatMap::Container& a, const FlatMap::Container& b) {
+    return a.key == b.key && a.value == b.value;
 }
 
 bool operator==(const FlatMap& a, const FlatMap& b) {
