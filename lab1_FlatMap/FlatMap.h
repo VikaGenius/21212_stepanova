@@ -47,6 +47,9 @@ public:
 	//O(n)
 	bool insert(const Key& k, const Value& v);
 
+	//Append key by index
+	void appendKey(const Key& k, const Value& v, size_t index);
+
 	// Checking if a value exists for a given key.
 	//O(log(n))
 	bool contains(const Key& k) const;

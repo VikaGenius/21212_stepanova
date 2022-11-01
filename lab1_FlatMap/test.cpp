@@ -29,10 +29,17 @@ TEST(FlatMapTest, Swap) {
 	EXPECT_EQ(a.contains(key2), true);
 	EXPECT_EQ(b.contains(key1), false);
 
-	a = b;
+	FlatMap c(a);
+	a = std::move(b);
+	c = a;
+
 	EXPECT_EQ(a.contains(key), true);
 	EXPECT_EQ(a.contains(key1), false);
 	EXPECT_EQ(a.contains(key2), true);
+	EXPECT_EQ(c.contains(key), true);
+	EXPECT_EQ(c.contains(key1), false);
+	EXPECT_EQ(c.contains(key2), true);
+
 
 }
 
@@ -217,6 +224,8 @@ TEST(FlatMapTest, Insert) {
 	EXPECT_EQ(map.contains(key), false);
 	EXPECT_EQ(map.contains(key1), false);
 	EXPECT_EQ(map.contains(key2), false);
+
+	EXPECT_EQ(map["aaa"].age, 0);
 
 	EXPECT_ANY_THROW(map.at(key11));
 	EXPECT_ANY_THROW(map.at(key1));

@@ -114,32 +114,38 @@ bool FlatMap::erase(const Key& k) {
 bool FlatMap::insert(const Key& k, const Value& v) {
     if (size_c > 0) {
         if (size_c == capacity) {
-            capacity *= kDefaultSizeMult;  
+            capacity *= kDefaultSizeMult;
             memoryExpansion();
         }
         size_t index = binarySearch(k);
         if (container[index].key == k) {
             return false;
         }
-        if (index == size_c) {
-            container[index] = { k, {v.age, v.weight} };
-            size_c++;
-            return true;
-        }
-
-        else {
-            std::copy_backward(container + index, container + size_c, container + size_c + 1);
-            container[index] = { k, {v.age, v.weight} };
-            size_c++;
-            return true;
-        }
-    }
-    else {
-        container[0] = { k, {v.age, v.weight} };
-        size_c++;
+        appendKey(k, v, index);
         return true;
     }
+    appendKey(k, v, 0);
+    return true;
 }
+
+void FlatMap::appendKey(const Key& k, const Value& v, size_t index) {
+    if (index == size_c) {
+        container[index] = { k, {v.age, v.weight} };
+        size_c++;
+        return;
+    }
+    else {
+        std::copy_backward(container + index, container + size_c, container + size_c + 1);
+        container[index] = { k, {v.age, v.weight} };
+        size_c++;
+        return;
+    }
+    if (index == 0) {
+        container[0] = { k, {v.age, v.weight} };
+        size_c++;
+    }
+}
+
 bool FlatMap::contains(const Key& k) const {
     return container[binarySearch(k)].key == k;
 }
@@ -149,9 +155,8 @@ Value& FlatMap::operator[](const Key& k) {
     if (container[ind].key == k) {
         return container[ind].value;
     }
-    //??/?????????????
     Value val;
-    insert(k, val);
+    appendKey(k, val, ind);
     return container[ind].value;
 }
 
