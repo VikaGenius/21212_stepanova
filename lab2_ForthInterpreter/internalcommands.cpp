@@ -62,5 +62,5 @@ void InternalCommands::Operation(std::stack <int>& stack1, std::deque<std::strin
 }
 
 std::unique_ptr<CommandForth> CreateInternalCommands() {
-	return  std::make_unique<CommandForth>(new InternalCommands);
+	return  std::unique_ptr<CommandForth>(new InternalCommands);
 }

@@ -17,7 +17,7 @@
 #include <deque>
 #include <memory>
 
-void Registration(Factory<CommandForth, std::string, std::unique_ptr<CommandForth>(*)()>& factory) {
+void Registration(Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth>(*)()>& factory) {
     factory.RegisterCommand("+", CreateArithmeticOperation);
     factory.RegisterCommand("-", CreateArithmeticOperation);
     factory.RegisterCommand("*", CreateArithmeticOperation);
@@ -47,7 +47,7 @@ bool IsNumber(const std::string& str) { //часть функции взята �
     return std::all_of(str.begin(), str.end(), [](const char& ch) { return isdigit(ch); });
 }
 
-void Parser(Factory<CommandForth, std::string, std::unique_ptr<CommandForth>(*)()>& factory, std::stack<int>& stack1, std::deque<std::string>& instruction) {
+void Parser(Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth>(*)()>& factory, std::stack<int>& stack1, std::deque<std::string>& instruction) {
     while (!instruction.empty()) {
         if (IsNumber(instruction.front())) {
             stack1.push(std::stoi(instruction.front()));
@@ -64,7 +64,7 @@ int main() {
     std::string str, word;
     std::stringstream stream;
 
-    Factory<CommandForth, std::string, std::unique_ptr<CommandForth> (*)()> factory;
+    Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth> (*)()> factory;
     Registration(factory);
 
     std::deque<std::string> instruction;
