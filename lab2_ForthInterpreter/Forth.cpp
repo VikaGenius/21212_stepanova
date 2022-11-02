@@ -2,138 +2,81 @@
 //
 
 #include "Factory.h"
+#include "arithmetic.h"
+#include "division.h"
+#include "internalcommands.h"
+#include "logicaloperations.h"
+#include "printstring.h"
+#include "ifoperator.h"
+#include "doloop.h"
 
 #include <fstream>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <deque>
+#include <memory>
 
-bool IsNumber(const std::string& str) {
+void Registration(Factory<CommandForth, std::string, std::unique_ptr<CommandForth>(*)()>& factory) {
+    factory.RegisterCommand("+", CreateArithmeticOperation);
+    factory.RegisterCommand("-", CreateArithmeticOperation);
+    factory.RegisterCommand("*", CreateArithmeticOperation);
+    factory.RegisterCommand("/", CreateOperationDivision);
+    factory.RegisterCommand("mod", CreateOperationDivision);
+    factory.RegisterCommand(">", CreateLogicalOperation);
+    factory.RegisterCommand("<", CreateLogicalOperation);
+    factory.RegisterCommand("=", CreateLogicalOperation);
+    factory.RegisterCommand("drop", CreateInternalCommands);
+    factory.RegisterCommand("cr", CreateInternalCommands);
+    factory.RegisterCommand("dup", CreateInternalCommands);
+    factory.RegisterCommand(".", CreateInternalCommands);
+    factory.RegisterCommand("emit", CreateInternalCommands);
+    factory.RegisterCommand("swap", CreateInternalCommands);
+    factory.RegisterCommand("rot", CreateInternalCommands);
+    factory.RegisterCommand("over", CreateInternalCommands);
+    factory.RegisterCommand("drop", CreateInternalCommands);
+    factory.RegisterCommand("if", CreateOperatorIf);
+    factory.RegisterCommand(".\"", CreatePrintString);
+    factory.RegisterCommand("do", CreateDoLoop);
+}
+
+bool IsNumber(const std::string& str) { //часть функции взята с стековерфлоу :D
+    if (str[0] == '-') {
+        return std::all_of(str.begin() + 1, str.end(), [](const char& ch) { return isdigit(ch); });
+    }
     return std::all_of(str.begin(), str.end(), [](const char& ch) { return isdigit(ch); });
 }
 
-
-void IfOperator(std::stringstream& stream, std::stack <int>& stack1, Factory& factory, std::string& str, std::string& word);
-void Cycle(std::stack <int>& stack1, Factory& factory, std::string& str);
-
-void Parser(std::stringstream& stream, std::stack <int>& stack1, Factory& factory, std::string& str, std::string& word) {
-    if (IsNumber(word)) {
-        stack1.push(std::stoi(word));
-    }
-    else if (word == "if") {
-        IfOperator(stream, stack1, factory, str, word);
-    }
-    else if (word == "do") {
-        Cycle(stack1, factory, str);
-    }
-    else {
-        factory.createCommandByName(word)->Operation(word, stack1);
+void Parser(Factory<CommandForth, std::string, std::unique_ptr<CommandForth>(*)()>& factory, std::stack<int>& stack1, std::deque<std::string>& instruction) {
+    while (!instruction.empty()) {
+        if (IsNumber(instruction.front())) {
+            stack1.push(std::stoi(instruction.front()));
+            instruction.pop_front();
+        }
+        else {
+            factory.createCommandByName(instruction.front())->Operation(stack1, instruction);
+        }
     }
 }
 
-void IfOperator(std::stringstream& stream, std::stack <int>& stack1, Factory& factory, std::string& str, std::string& word) {
-    if (str.substr(str.size()-6) != "then ;") { 
-        throw std::invalid_argument("Error: unknown command"); 
-    }
-    str.erase(str.size() - 6);
-    if (stack1.top() != 0) {
-        while (stream >> word && word != "else") {
-            //    if (IsNumber(word)) {
-            //        stack1.push(std::stoi(word));
-            //    }
-            //    else if (word == "if") {
-            //        IfOperator(stream, stack1, factory, str, word);
-            //        break;
-            //    }
-            //    //ду луп
-            //    else {
-            //        factory.createCommandByName(word)->Operation(word, stack1);
-            //    }
-            //}
-            Parser(stream, stack1, factory, str, word);
-        }
-    }
-    else {
-        int countIf = 0;
-        while (stream >> word && word != "else") {
-            if (word == "if") {
-                countIf++;
-            }
-            if (word == "then") {
-                stream >> word;
-                if (word == ";") {
-                    countIf--;
-                }
-                else {
-                    throw std::invalid_argument("Error: unknown command");
-                }
-            }
-            if (word == "else" && countIf == 0) {
-                while (stream >> word) {
-                    Parser(stream, stack1, factory, str, word);
-                }
-            }
-        }
-
-    }
-    
-}
-
-void Cycle(std::stack <int>& stack1, Factory& factory, std::string& str) {
-    if (str.substr(str.size() - 6) != "loop ;") {
-        throw std::invalid_argument("Error: unknown command");
-    }
-    str.erase(str.size() - 6);
-    int i = stack1.top();
-    stack1.pop();
-    int end = stack1.top();
-    stack1.pop();
-    std::string str1;
-    std::stringstream stream1;
-    std::string word;
-    for (i; i < end; i++) {
-        str1 = str;
-        stream1 << str1;
-        while(stream1 >> word) {
-            Parser(stream1, stack1, factory, str, word);
-        }
-    }
-
-}
-
-int main()
-{
-    std::cout << "Hello World!\n";
-
+int main() {
     std::ifstream file("file.txt");
     std::string str, word;
     std::stringstream stream;
 
-    std::stack <int> stack1;
-    Factory factory;
+    Factory<CommandForth, std::string, std::unique_ptr<CommandForth> (*)()> factory;
+    Registration(factory);
 
+    std::deque<std::string> instruction;
     while (std::getline(file, str)) {
+        stream.clear();
         stream << str;
         while (stream >> word) {
-            if (IsNumber(word)) {
-                stack1.push(std::stoi(word));
-            }
-        
-            else if (word == "if") {
-                IfOperator(stream, stack1, factory, str, word);
-                continue;
-            }
-            else if (word == "do") {
-                Cycle(stack1, factory, str);
-                continue;
-            }
-            //принтстринг
-            else {
-                factory.createCommandByName(word)->Operation(word, stack1);
-            }
+            instruction.push_back(word);
         }
+        std::stack <int> stack1;
+        Parser(factory, stack1, instruction);
     }
-
     return 0;
 }
 

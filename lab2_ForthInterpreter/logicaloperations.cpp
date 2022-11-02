@@ -4,7 +4,9 @@
 
 //void LogicalOperation::Operation() {}
 
-void LogicalOperation::Operation(const std::string& oper, std::stack <int>& stack1) {
+void LogicalOperation::Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) {
+	const std::string oper = instruction.front();
+	instruction.pop_front();
 	if (stack1.size() > 1) {
 		int a = stack1.top();
 		stack1.pop();
@@ -32,6 +34,6 @@ void LogicalOperation::Operation(const std::string& oper, std::stack <int>& stac
 	throw std::invalid_argument("Error: not enough numbers to complete the operation");
 }
 
-CommandForth* CreateLogicalOperation() {
-	return new LogicalOperation;
+std::unique_ptr<CommandForth> CreateLogicalOperation() {
+	return std::unique_ptr<CommandForth>(new LogicalOperation);
 }

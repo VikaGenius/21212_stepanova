@@ -3,6 +3,7 @@
 #include "CommandForth.h"
 
 class OperatorIf : public CommandForth {
-	void Operation(const std::string& oper, std::stack<int>& stack1) override;
-	void Operation1(std::string& str, std::stack<int>& stack1);
+	void Operation(std::stack<int>& stack1, std::deque<std::string>& instruction) override;
 };
+
+std::unique_ptr<CommandForth> CreateOperatorIf();

@@ -13,8 +13,8 @@ class InternalCommands : public CommandForth {
     //over - copy the second number and put a copy over the top one
 	//emit - print the top number on the stack as an ascii code and remove it from the stack
 	//cr - line break
-	void Operation(const std::string& oper, std::stack <int>& stack1) override;
+	void Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) override;
 
 };
 
-CommandForth* CreateInternalCommands();
+std::unique_ptr<CommandForth> CreateInternalCommands();

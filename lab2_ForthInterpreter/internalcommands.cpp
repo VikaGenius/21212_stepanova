@@ -3,7 +3,9 @@
 #include <stdexcept>
 #include <iostream>
 
-void InternalCommands::Operation(const std::string& oper, std::stack <int>& stack1) {
+void InternalCommands::Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) {
+	const std::string oper = instruction.front();
+	instruction.pop_front();
 	if (stack1.empty()) {
 		throw std::invalid_argument("Error: stack is empty");
 	}
@@ -59,8 +61,6 @@ void InternalCommands::Operation(const std::string& oper, std::stack <int>& stac
 
 }
 
-CommandForth* CreateInternalCommands() {
-	//auto ptr = std::make_unique<InternalCommands>();
-	//return ptr;
-	return new InternalCommands;
+std::unique_ptr<CommandForth> CreateInternalCommands() {
+	return  std::make_unique<CommandForth>(new InternalCommands);
 }

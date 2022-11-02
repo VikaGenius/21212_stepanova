@@ -4,7 +4,7 @@
 
 class PrintString : public CommandForth {
 	//Prints the given string
-	void Operation(const std::string& oper, std::stack<int>& stack1) override;
+	void Operation(std::stack<int>& stack1, std::deque<std::string>& instruction) override;
 };
 
-CommandForth* CreatePrintString();
+std::unique_ptr<CommandForth> CreatePrintString();

@@ -5,7 +5,7 @@
 class ArithmeticOperation : public CommandForth {
 
 	//Performs an addition, subtraction, or multiplication operation
-	void Operation(const std::string& oper, std::stack <int>& stack1) override;
+	void Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) override;
 };
 
-CommandForth* CreateArithmeticOperation();
+std::unique_ptr<CommandForth> CreateArithmeticOperation();
