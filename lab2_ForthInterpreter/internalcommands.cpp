@@ -58,7 +58,6 @@ void InternalCommands::Operation(std::stack <int>& stack1, std::deque<std::strin
 		stack1.push(third);
 		stack1.push(second);
 	}
-
 }
 
 std::unique_ptr<CommandForth> CreateInternalCommands() {

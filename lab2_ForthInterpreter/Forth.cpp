@@ -1,7 +1,4 @@
-﻿// Forth.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
-#include "Factory.h"
+﻿#include "Factory.h"
 #include "arithmetic.h"
 #include "division.h"
 #include "internalcommands.h"
@@ -59,24 +56,37 @@ void Parser(Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<
     }
 }
 
-int main() {
-    std::ifstream file("file.txt");
+int main(int argc, char* argv[]) {
     std::string str, word;
     std::stringstream stream;
 
-    Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth> (*)()> factory;
+    Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth>(*)()> factory;
     Registration(factory);
 
     std::deque<std::string> instruction;
-    while (std::getline(file, str)) {
-        stream.clear();
+    std::stack <int> stack1;
+
+    if (argc == 1) {
+        std::string filename = argv[1];
+        std::ifstream file(filename);
+        while (std::getline(file, str)) {
+            stream.clear();
+            stream << str;
+            while (stream >> word) {
+                instruction.push_back(word);
+            }
+            Parser(factory, stack1, instruction);
+        }
+    }
+    else {
+        std::getline(std::cin, str);
         stream << str;
         while (stream >> word) {
             instruction.push_back(word);
         }
-        std::stack <int> stack1;
         Parser(factory, stack1, instruction);
     }
+
     return 0;
 }
 

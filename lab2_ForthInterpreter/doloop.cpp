@@ -15,6 +15,7 @@ void DoLoop::Operation(std::stack <int>& stack1, std::deque<std::string>& instru
 
 	while (index < instruction.size() && instruction[index] != "loop") {
 		cycle.push_back(instruction[index]);
+		index++;
 	}
 	if (instruction[index] == "loop") {
 		if (index + 1 != instruction.size() && instruction[index + 1] == ";") {
@@ -30,7 +31,7 @@ void DoLoop::Operation(std::stack <int>& stack1, std::deque<std::string>& instru
 	int end = stack1.top();
 	stack1.pop();
 	for (i; i < end - 1; i++) {
-		for (size_t j = cycle.size() - 1; j >= 0; j--) {
+		for (int j = cycle.size() - 1; j >= 0; j--) {
 			instruction.push_front(cycle[j]);
 		}
 	}
