@@ -1,0 +1,2 @@
+5 5 + 7 * 4 - 11 / 5 mod if . then ;
+67 8 drop emit 0 if 5 else 7 over swap 8 then ;
