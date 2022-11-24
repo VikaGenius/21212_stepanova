@@ -1,9 +1,4 @@
-#include "FlatMap.cpp"
 #include <gtest/gtest.h>
-
-//#include "pch.h"
-//#include "FlatMap.h"
-
 
 TEST(FlatMapTest, Swap) {
 	FlatMap a;
@@ -230,8 +225,6 @@ TEST(FlatMapTest, Insert) {
 	EXPECT_ANY_THROW(map.at(key11));
 	EXPECT_ANY_THROW(map.at(key1));
 	EXPECT_ANY_THROW(map.at(key2));
-
-
 }
 
 TEST(FlatMapTest, Operators) {

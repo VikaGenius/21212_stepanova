@@ -140,10 +140,6 @@ void FlatMap::appendKey(const Key& k, const Value& v, size_t index) {
         size_c++;
         return;
     }
-    if (index == 0) {
-        container[0] = { k, {v.age, v.weight} };
-        size_c++;
-    }
 }
 
 bool FlatMap::contains(const Key& k) const {
