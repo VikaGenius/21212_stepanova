@@ -2,11 +2,14 @@
 
 #include "CommandForth.h"
 
+#include <iostream>
+
 class DoLoop: public CommandForth {
 
 	//Handles the action loop
-	void Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) override;
+	void Operation(ExecutionContext& context) override;
 };
 
-std::unique_ptr<CommandForth> CreateDoLoop();
+CommandForth* CreateDoLoop();
 
+void PushCycle(ExecutionContext& context, std::vector<std::string>& cycle);

@@ -1,24 +1,35 @@
 #include "printstring.h"
 
-#include <iostream>
 #include <stdexcept>
+#include <fstream>
+#include <queue>
 
-
-
-void PrintString::Operation(std::stack<int>& stack1, std::deque<std::string>& instruction) {
-	instruction.pop_front();
-	while (instruction.front() != "\"") {
-		std::cout << instruction.front();
-		instruction.pop_front();
-	}
-	if (!instruction.empty() && instruction.front() == "\"") {
-		instruction.pop_front();
-		std::cout << std::endl;
-		return;
+void PrintString::Operation(ExecutionContext& context) {
+	context.InstructionPopFront();
+	std::queue<std::string> str;
+	std::string word;
+	//std::ofstream out;          // поток для записи
+    //out.open("out.txt");
+	while (context.InstructionSize() > 0) {
+		word = context.InstructionFront();
+		if (word[word.size() - 1] == '"') {
+			word.pop_back();
+			str.push(word);
+			context.InstructionPopFront();
+			while (!str.empty()) {
+				context.PrintLine() << str.front() << " ";
+				str.pop();
+			}
+			context.PrintLine() << std::endl;
+			return;
+		}
+		str.push(word);
+		//output << instruction.front();
+		context.InstructionPopFront();
 	}
 	throw std::invalid_argument("Error: unknown command");
 }
 
-std::unique_ptr<CommandForth> CreatePrintString() {
-	return std::unique_ptr<CommandForth>(new PrintString);
+CommandForth* CreatePrintString() {
+	return new PrintString;
 }

@@ -1,42 +1,68 @@
-#pragma once
-
 #include "doloop.h"
 
 #include <vector>
 #include <stdexcept>
+#include <sstream>
 
-
-
-void DoLoop::Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) {
-	instruction.pop_front();
+void DoLoop::Operation(ExecutionContext& context) {
+	context.InstructionPopFront();
 
 	std::vector<std::string> cycle;
-	size_t index = 0;
-
-	while (index < instruction.size() && instruction[index] != "loop") {
-		cycle.push_back(instruction[index]);
-		index++;
-	}
-	if (instruction[index] == "loop") {
-		if (index + 1 != instruction.size() && instruction[index + 1] == ";") {
-			instruction.erase(instruction.begin() + index);
-			instruction.erase(instruction.begin() + index);
+	int countDo = 0;
+	while (context.InstructionSize() > 0) {
+		if (context.InstructionFront() == "do") {
+			countDo++;
 		}
-		else {
-			throw std::invalid_argument("Error: unknown command");
+		if (context.InstructionFront() == "loop" && countDo != 0) {
+			countDo--;
+		}
+		else if (context.InstructionFront() == "loop" && countDo == 0) {
+			if (context.InstructionSize() > 1) {
+				context.InstructionPopFront();
+				if (context.InstructionFront() == ";") {
+					context.InstructionPopFront();
+					PushCycle(context, cycle);
+					return;
+				}
+				else {
+					throw std::invalid_argument("Error: unknown command");
+				}
+			}
+			else {
+				throw std::invalid_argument("Error: unknown command");
+			}
+		}
+		cycle.push_back(context.InstructionFront());
+		context.InstructionPopFront();
+		if (context.InstructionSize() == 0) {
+			context.ReadLine();
 		}
 	}
-	int i = stack1.top();
-	stack1.pop();
-	int end = stack1.top();
-	stack1.pop();
-	for (i; i < end - 1; i++) {
-		for (int j = cycle.size() - 1; j >= 0; j--) {
-			instruction.push_front(cycle[j]);
-		}
-	}
+	throw std::invalid_argument("Error: unknown command");
 }
 
-std::unique_ptr<CommandForth> CreateDoLoop() {
-	return std::unique_ptr<CommandForth>(new DoLoop);
+CommandForth* CreateDoLoop() {
+	return new DoLoop;
+}
+
+void PushCycle(ExecutionContext& context, std::vector<std::string>& cycle) {
+	if (context.StackSize() < 2) {
+		throw std::invalid_argument("Error: Not enough numbers on the stack");
+	}
+
+	int i = context.StackTop();
+	context.StackPop();
+	int end = context.StackTop();;
+	context.StackPop();
+
+	if (end < i) {
+		throw std::invalid_argument("Error: unknown command");
+	}
+
+	while (i < end) { 
+		for (int j = cycle.size() - 1; j >= 0; j--) {
+			context.InstructionPushFront(cycle[j]);
+		}
+		i++;
+	}
 }

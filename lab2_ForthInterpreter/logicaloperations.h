@@ -4,8 +4,8 @@
 
 class LogicalOperation : public CommandForth {
 	//Boolean operations (>, <, =)
-	void Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) override;
+	void Operation(ExecutionContext& context) override;
 };
 
-std::unique_ptr<CommandForth> CreateLogicalOperation();
+CommandForth* CreateLogicalOperation();
 

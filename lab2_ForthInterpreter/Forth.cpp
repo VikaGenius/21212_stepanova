@@ -1,4 +1,4 @@
-﻿#include "Factory.h"
+﻿/*#include "Factory.h"
 #include "arithmetic.h"
 #include "division.h"
 #include "internalcommands.h"
@@ -6,15 +6,15 @@
 #include "printstring.h"
 #include "ifoperator.h"
 #include "doloop.h"
+#include "Forth.h"
 
 #include <fstream>
 #include <iostream>
 #include <algorithm>
 #include <sstream>
 #include <deque>
-#include <memory>
 
-void Registration(Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth>(*)()>& factory) {
+void Registration(Factory<CommandForth, std::string, CommandForth*(*)()>& factory) {
     factory.RegisterCommand("+", CreateArithmeticOperation);
     factory.RegisterCommand("-", CreateArithmeticOperation);
     factory.RegisterCommand("*", CreateArithmeticOperation);
@@ -38,55 +38,43 @@ void Registration(Factory<std::unique_ptr<CommandForth>, std::string, std::uniqu
 }
 
 bool IsNumber(const std::string& str) { //часть функции взята с стековерфлоу :D
-    if (str[0] == '-') {
+    if (str[0] == '-' && str[1]) { //+
         return std::all_of(str.begin() + 1, str.end(), [](const char& ch) { return isdigit(ch); });
     }
     return std::all_of(str.begin(), str.end(), [](const char& ch) { return isdigit(ch); });
 }
 
-void Parser(Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth>(*)()>& factory, std::stack<int>& stack1, std::deque<std::string>& instruction) {
+void Parser(Factory<CommandForth, std::string, CommandForth*(*)()>& factory, std::stack<int>& stack1, std::deque<std::string>& instruction, std::istream& input, std::ostream& output) {
     while (!instruction.empty()) {
         if (IsNumber(instruction.front())) {
             stack1.push(std::stoi(instruction.front()));
             instruction.pop_front();
         }
         else {
-            factory.createCommandByName(instruction.front())->Operation(stack1, instruction);
+            auto oper = std::unique_ptr<CommandForth>(factory.CreateCommand(instruction.front()));
+            oper->Operation(stack1, instruction, input, output);
         }
     }
 }
 
-int main(int argc, char* argv[]) {
+void Executor(std::stack<int>& stack1, std::istream& input, std::ostream& output) {
     std::string str, word;
     std::stringstream stream;
 
-    Factory<std::unique_ptr<CommandForth>, std::string, std::unique_ptr<CommandForth>(*)()> factory;
+    Factory<CommandForth, std::string, CommandForth*(*)()> factory;
     Registration(factory);
-
     std::deque<std::string> instruction;
-    std::stack <int> stack1;
-
-    if (argc == 1) {
-        std::string filename = argv[1];
-        std::ifstream file(filename);
-        while (std::getline(file, str)) {
+    while (std::getline(input, str)) {
             stream.clear();
             stream << str;
             while (stream >> word) {
                 instruction.push_back(word);
             }
-            Parser(factory, stack1, instruction);
+            Parser(factory, stack1, instruction, input, output);
         }
-    }
-    else {
-        std::getline(std::cin, str);
-        stream << str;
-        while (stream >> word) {
-            instruction.push_back(word);
-        }
-        Parser(factory, stack1, instruction);
-    }
-
-    return 0;
 }
+*/
+// int main(int argc, char* argv[]) {
+//    std::string str, word;
+
 

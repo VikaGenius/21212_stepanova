@@ -2,8 +2,16 @@
 
 #include "CommandForth.h"
 
+#include <iostream>
+
 class OperatorIf : public CommandForth {
-	void Operation(std::stack<int>& stack1, std::deque<std::string>& instruction) override;
+	void Operation(ExecutionContext& context) override;
 };
 
-std::unique_ptr<CommandForth> CreateOperatorIf();
+CommandForth* CreateOperatorIf();
+
+void AfterElse(ExecutionContext& context, int countIf, std::stack<std::string>& stackIf, int isPush);
+
+int Then (ExecutionContext& context, int& countIf, std::stack<std::string>& stackIf, int isPush);
+
+void Push (ExecutionContext& context, std::stack<std::string>& stackIf);

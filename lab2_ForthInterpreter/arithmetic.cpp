@@ -2,36 +2,50 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <limits.h>
 
-
-void ArithmeticOperation::Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) {
-	const std::string oper = instruction.front();
-	instruction.pop_front();
-	if (stack1.size() > 1) {
-		int a = stack1.top();
-		stack1.pop();
-		int b = stack1.top();
-		stack1.pop();
+void ArithmeticOperation::Operation(ExecutionContext& context) {
+	const std::string oper = context.InstructionFront();
+	context.InstructionPopFront();
+	if (context.StackSize() > 1) {
+		int a = context.StackTop();
+		context.StackPop();
+		int b = context.StackTop();
+		context.StackPop();
+		long long resultOperation;
 		if (oper == "+") {
-			stack1.push(b + a);
+			resultOperation = static_cast<long long>(b) + static_cast<long long>(a);
+			IsOverflow(resultOperation);
+			context.StackPush(b + a);
 			return;
 		}
 		if (oper == "-") {
-			stack1.push(b - a);
+			resultOperation = static_cast<long long>(b) - static_cast<long long>(a);
+			IsOverflow(resultOperation);
+			context.StackPush(b - a);
 			return;
 		}
 		if (oper == "*") {
-			stack1.push(b * a);
+			resultOperation = static_cast<long long>(b) * static_cast<long long>(a);
+			IsOverflow(resultOperation);
+			context.StackPush(b * a);
 			return;
 		}
 	}
-	if (!stack1.empty()) {
-		stack1.pop();
+	if (!context.StackIsEmpty()) {
+		context.StackPop();
 	}
 	throw std::invalid_argument("Error: not enough numbers to complete the operation");
 
 }
 
-std::unique_ptr<CommandForth> CreateArithmeticOperation() {
-	return std::unique_ptr<CommandForth>(new ArithmeticOperation);
+CommandForth* CreateArithmeticOperation() {
+	return new ArithmeticOperation;
 }
+
+void IsOverflow (long long resultOperation) {
+	if (resultOperation > INT_MAX || resultOperation < INT_MIN) { 
+			throw std::invalid_argument("Error: integer type overflow");
+	}
+}
+

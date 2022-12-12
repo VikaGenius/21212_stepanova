@@ -13,8 +13,9 @@ class InternalCommands : public CommandForth {
     //over - copy the second number and put a copy over the top one
 	//emit - print the top number on the stack as an ascii code and remove it from the stack
 	//cr - line break
-	void Operation(std::stack <int>& stack1, std::deque<std::string>& instruction) override;
+	void Operation(ExecutionContext& context) override;
 
 };
 
-std::unique_ptr<CommandForth> CreateInternalCommands();
+CommandForth* CreateInternalCommands();
+void IsEmpty(ExecutionContext& context); //check stack empty or no

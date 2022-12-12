@@ -1,83 +1,125 @@
 #include "ifoperator.h"
 
 #include <stdexcept>
+#include <sstream>
 
-void OperatorIf::Operation(std::stack<int>& stack1, std::deque<std::string>& instruction) {
-	if (stack1.empty()) {
+void OperatorIf::Operation(ExecutionContext& context) {
+	if (context.StackIsEmpty()) {
 		throw std::invalid_argument("Error: stack is empty");
 	}
-	instruction.pop_front();
-	if (stack1.top() != 0) { //если вершина стека не равна 0
-		int countIf = 0; // счетчик вложенных if
-		for (size_t i = 0; i < instruction.size(); i++) {
-			if (instruction[i] == "if") {
+	context.InstructionPopFront();
+
+	int countIf = 0;
+	std::stack<std::string> stackIf;
+	if (context.StackTop() == 0) {
+		while (context.InstructionSize() > 0) {
+			if (context.InstructionFront() == "if") {
 				countIf++;
 			}
-			if (instruction[i] == "then") {
-				if (instruction[i + 1] == ";") {
-					if (countIf == 0) { // конец if, который зашел в эту функцию. при отсутствии else просто убираем then ;
-						instruction.erase(instruction.begin() + i);
-						instruction.erase(instruction.begin() + i);
-						return;
-					}
-					countIf--;
-					
-				}
-				else {
-					throw std::invalid_argument("Error: unknown command");
+			if (context.InstructionFront() == "else" && countIf == 0) {
+				context.InstructionPopFront();
+				int isPush = 1;
+				AfterElse(context, countIf, stackIf, isPush);
+				Push(context, stackIf);
+				return;
+			} 
+			if (context.InstructionFront() == "then") {
+				int isPush = 0;
+				if (Then(context, countIf, stackIf, isPush) == 0) {
+					Push(context, stackIf);
+					return;
 				}
 			}
-			if (instruction[i] == "else") {
-				if (countIf == 0) { //else основного if. тк вершина стека не равна 0, вырезаем инструкцию "else"
-					while (i < instruction.size() && instruction[i] != "then") {
-						instruction.erase(instruction.begin() + i);
-						i++;
-					}
-					if (instruction[i] == "then" && instruction[i + 1] == ";") {
-						instruction.erase(instruction.begin() + i);
-						instruction.erase(instruction.begin() + i);
-						return;
-					}
-					throw std::invalid_argument("Error: unknown command");
-
-				}
+			context.InstructionPopFront();
+			if (context.InstructionIsEmpty()) {
+				context.ReadLine();
 			}
 		}
 	}
-	else { //вершина стека равна 0
-		int countIf = 0; // счетчик вложенных if
-		int index = 0;
-		while (!instruction.empty()) {
-			if (instruction[index] == "else" && countIf == 0) { //встретили else нашего if, вырезаем else и then ;
-				instruction.pop_front();
-				size_t size = instruction.size();
-				while (index < size && instruction[index] != "then") {
-					index++;
-				}
-				if (instruction[index] == "then" && instruction[index + 1] == ";") {
-					instruction.erase(instruction.begin() + index);
-					instruction.erase(instruction.begin() + index);
+	else {
+		while (context.InstructionSize() > 0) {
+			if (context.InstructionFront() == "if") {
+				countIf++;
+			}
+			if (context.InstructionFront() == "else" && countIf == 0) {
+				context.InstructionPopFront();
+				int isPush = 0;
+				AfterElse(context, countIf, stackIf, isPush);
+				Push(context, stackIf);
+				return;
+			}
+			if (context.InstructionFront() == "then") {
+				int isPush = 1;
+				if (Then(context, countIf, stackIf, isPush) == 0) {
+					Push(context, stackIf);
 					return;
 				}
-				throw std::invalid_argument("Error: unknown command");
 			}
-			if (instruction[index] == "then" && countIf == 0) { // встретили then нашего if, вырезаем then ;
-				if (instruction[index + 1] == ";") {
-					instruction.pop_front();
-					instruction.pop_front();
-					return;
-				}
-				throw std::invalid_argument("Error: unknown command");
+			stackIf.push(context.InstructionFront());
+			context.InstructionPopFront();
+
+			if (context.InstructionIsEmpty()) {
+				context.ReadLine();
 			}
-			instruction.pop_front(); // вырезаем до else (в случае отсутствия - до then)
 		}
 	}
-	throw std::invalid_argument("Error: unknown command"); //дошли до конца строки и не обнаружили then ;
+	throw std::invalid_argument("Error: unknown command");
 }
 
-std::unique_ptr<CommandForth> CreateOperatorIf() {
-	return std::unique_ptr<CommandForth>(new OperatorIf);
+CommandForth* CreateOperatorIf() {
+	return new OperatorIf;
 }
+
+void AfterElse(ExecutionContext& context, int countIf, std::stack<std::string>& stackIf, int isPush) {
+	while (!context.InstructionIsEmpty()) {
+		if (context.InstructionFront() == "if") {
+			countIf++;
+		}
+		if (context.InstructionFront() == "then") {
+			if (Then(context, countIf, stackIf, isPush) == 0) {
+				return;
+			}
+		}
+		if (isPush == 1) {
+			stackIf.push(context.InstructionFront());
+		}
+		context.InstructionPopFront();
+
+		if (context.InstructionIsEmpty()) {
+			context.ReadLine();
+		}
+	}
+}
+
+int Then (ExecutionContext& context, int& countIf, std::stack<std::string>& stackIf, int isPush) {
+	context.InstructionPopFront(); 
+	if (!context.InstructionIsEmpty() && context.InstructionFront() == ";") {
+		if (countIf == 0) {
+			context.InstructionPopFront(); 
+			return 0;
+		}
+		else {
+			if (isPush == 1) {
+				stackIf.push("then");
+			}
+			countIf--;
+		}
+	}
+	else {
+		throw std::invalid_argument("Error: unknown command");
+	}
+	return 1;
+}
+
+void Push (ExecutionContext& context, std::stack<std::string>& stackIf) {
+	while (!stackIf.empty()) {
+		context.InstructionPushFront(stackIf.top());
+		stackIf.pop();
+	}
+}
+
+
+
 
 
 
