@@ -12,7 +12,7 @@ TEST(ForthTests, ValueOnTheStack) {
 	std::ifstream out("out.txt");
 	std::string str;
     std::getline(out, str);
-	EXPECT_EQ(str == "1C8754", true);
+	EXPECT_EQ(str == "1C875411", true);
 }
 
 TEST(ForthTests, LogicOperations) {
@@ -93,14 +93,14 @@ TEST(ForthTests, IfElse2) {
 	std::stringstream str;
 	std::ofstream output;
 	output.open("out.txt", std::ofstream::out | std::ofstream::trunc);
-	str << "0 if 1 else 2 if 5 . then ; . then ;";
+	str << "0 if 1 else 2 if 5 . then ; . then ; 1 if 1 . else 0 . then ;";
 	Interpreter a(str, output);
 	EXPECT_NO_THROW(a.Executor());
 	output.close();
 	std::ifstream out("out.txt");
 	std::string str1;
     std::getline(out, str1);
-	EXPECT_EQ(str1 == "52", true);
+	EXPECT_EQ(str1 == "521", true);
 }
 
 TEST(ForthTests, NestingDo) {
@@ -249,6 +249,21 @@ TEST(ForthTests, Throw) {
  	str25 << "/";
 	Interpreter a25(str25);
  	EXPECT_ANY_THROW(a25.Executor());
+
+	std::stringstream str26;
+ 	str26 << "10 0 do 1 do loop ;";
+	Interpreter a26(str26);
+ 	EXPECT_ANY_THROW(a26.Executor());
+
+	std::stringstream str27;
+ 	str27 << "10 0 do loop ; loop ;";
+	Interpreter a27(str27);
+ 	EXPECT_ANY_THROW(a27.Executor());
+
+	std::stringstream str28;
+ 	str28 << "10 0 do loop . .";
+	Interpreter a28(str28);
+ 	EXPECT_ANY_THROW(a28.Executor());
 }
 
 int main(int argc, char** argv) {
