@@ -6,8 +6,6 @@
 void InternalCommands::Operation(ExecutionContext& context) {
 	const std::string oper = context.InstructionFront();
 	context.InstructionPopFront();
-	//std::ofstream out;          // поток для записи
-    //out.open("out.txt");
 
 	if (oper == "cr") {
 		context.PrintLine() << std::endl;

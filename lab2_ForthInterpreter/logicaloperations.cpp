@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-//void LogicalOperation::Operation() {}
-
 void LogicalOperation::Operation(ExecutionContext& context) {
 	const std::string oper = context.InstructionFront();
 	context.InstructionPopFront();

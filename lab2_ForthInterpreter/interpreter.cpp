@@ -34,7 +34,7 @@ void Interpreter::Registration() {
     factory.RegisterCommand("do", CreateDoLoop);
 }
 
-bool Interpreter::IsNumber(const std::string& str) { //часть функции взята с стековерфлоу :D
+bool Interpreter::IsNumber(const std::string& str) { 
     if ((str[0] == '-' || str[0] == '+') && str[1]) { 
         return std::all_of(str.begin() + 1, str.end(), [](const char& ch) { return isdigit(ch); });
     }

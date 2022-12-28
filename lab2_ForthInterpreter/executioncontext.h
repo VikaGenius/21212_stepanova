@@ -6,29 +6,29 @@
 
 class ExecutionContext {
 public:
-ExecutionContext(std::istream& in = std::cin, std::ostream& out = std::cout): input(in), output(out) {}
-~ExecutionContext() = default;
+    ExecutionContext(std::istream& in = std::cin, std::ostream& out = std::cout): input(in), output(out) {}
+    ~ExecutionContext() = default;
 
-//read next line of programm
-void ReadLine();
+    //read next line of programm
+    void ReadLine();
 
-//
-std::ostream& PrintLine();
+    //print string or output value
+    std::ostream& PrintLine();
 
-//operation with stack
-void StackPush(int a);
-void StackPop();
-int StackTop();
-bool StackIsEmpty();
-size_t StackSize();
+    //operation with stack
+    void StackPush(int a);
+    void StackPop();
+    int StackTop();
+    bool StackIsEmpty();
+    size_t StackSize();
 
-//operation with instruction
-void InstructionPushBack(const std::string& a);
-void InstructionPushFront(const std::string& a);
-void InstructionPopFront();
-std::string InstructionFront();
-bool InstructionIsEmpty();
-size_t InstructionSize();
+    //operation with instruction
+    void InstructionPushBack(const std::string& a);
+    void InstructionPushFront(const std::string& a);
+    void InstructionPopFront();
+    std::string InstructionFront();
+    bool InstructionIsEmpty();
+    size_t InstructionSize();
 
 private:
     std::stack<int> stack1;
