@@ -1,16 +1,12 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include "block.h"
 #include "tetris.h"
 
 #include <QGraphicsItem>
-#include <QGraphicsItemGroup>
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QKeyEvent>
-
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class GameWidget; }
@@ -23,26 +19,27 @@ class GameWidget : public QWidget
 public:
     GameWidget(QWidget *parent = nullptr);
     ~GameWidget();
-    void GameStart();
-    void Painting();
-    void GameOver();
 
-public slots:
+private slots:
     void keyPressEvent(QKeyEvent *event) override;
     void timerEvent(QTimerEvent* event) override;
 
 
 private:
-    Ui::GameWidget *ui;
-    QGraphicsScene *gameScene = nullptr;
-    Tetris* tetris = nullptr;
-    Block* currentBlock = nullptr;
-    QGraphicsItemGroup* blockGroup = nullptr;
+    Ui::GameWidget* ui;
+    QGraphicsScene* gameScene = nullptr;
+    QGraphicsScene* nextScene = nullptr;
+    Tetris tetris;
     int timerGame;
     int timerPainting;
     int speed = 800;
     int update = 3;
-    int score = 0;
-    //задать количество очков, следующий элемент
+    int level = 0;
+
+    void GameStart();
+    void Painting();
+    void GameOver();
+    void LevelUp();
+
 };
 #endif // WIDGET_H

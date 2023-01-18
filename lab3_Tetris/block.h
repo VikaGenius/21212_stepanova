@@ -3,27 +3,19 @@
 
 #include <QColor>
 
+constexpr int sizeBlock = 4;
+
 class Block
 {
 public:
     int curX = 4;
     int curY = 0;
+    int block[4][4];
 
     explicit Block();
+    Block(const Block& other) noexcept;
+    Block& operator=(const Block& other);
     void RotateBlock();
-    void CopyBlock(int dst[4][4], int src[4][4]);
-    void CreateBlock(int dst[4][4]);
-    void RestoreBlock();
-
-signals:
-
-
-private:
-
-public:
-    int block[4][4];
-    int nextBlock[4][4];
-    int tmpBlock[4][4];
 };
 
 #endif // BLOCK_H

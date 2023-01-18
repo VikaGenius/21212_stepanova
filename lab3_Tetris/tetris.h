@@ -2,6 +2,8 @@
 #define TETRIS_H
 
 #include "block.h"
+#include "score.h"
+
 #include <QWidget>
 
 constexpr int fieldWidth = 10;
@@ -18,22 +20,20 @@ class Tetris : public QWidget
     Q_OBJECT
 public:
     explicit Tetris(QWidget *parent = nullptr);
-    void Game();
-    bool BlockSpawn(Block* curBlock);
-    void BlockMove(Block* curBlock, char where);
-    void BlockMoving(Block* curBlock, int x, int y);
-    bool FullLineOrColumn();
-    int tetrisWindow[fieldWidth][fieldHeight] = {0};
-    int countOfLine = 0;
+    bool BlockMove(char where);
+    bool BlockSpawn();
+
+    int tetrisWindow[fieldHeight][fieldWidth];
+    Block nextBlock;
     GameStatus status;
-signals:
+    Score score;
+    int level = 0;
 
 private:
-
-    //const static int fieldWidth = 10;
-    //const static int fieldHeight = 20;
-    //int tetrisWindow[fieldWidth][fieldHeight] = {0};
-
+    void clearBlockOnWindow();
+    void FullLineOrColumn();
+    void RestoreBlock();
+    Block curBlock;
 };
 
 #endif // TETRIS_H

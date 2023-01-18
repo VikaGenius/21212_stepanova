@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/media">
+        <file>music/Eminem - Not afraid.mp3</file>
+        <file>music/Eminem - Superman.mp3</file>
+        <file>music/Eminem - Without Me.mp3</file>
+        <file>music/Eminem Feat. Dido - Stan.mp3</file>
+        <file>music/Eminem feat. Juice WRLD - Godzilla.mp3</file>
+    </qresource>
+</RCC>

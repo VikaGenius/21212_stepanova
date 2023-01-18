@@ -2,82 +2,77 @@
 #include <stdlib.h>
 #include <time.h>
 
-constexpr int sizeBlock = 4;
+const int block1[4][4] =  {{0, 1, 0, 0},
+                           {0, 1, 0, 0},
+                           {0, 1, 0, 0},
+                           {0, 1, 0, 0}};
+const int block2[4][4] = {{0, 0, 0, 0},
+                          {0, 2, 2, 0},
+                          {0, 0, 2, 2},
+                          {0, 0, 0, 0}};
+const int block3[4][4] = {{0, 0, 0, 0},
+                          {0, 3, 3, 3},
+                          {0, 0, 3, 0},
+                          {0, 0, 0, 0}};
+const int block4[4][4] = {{0, 4, 4, 0},
+                          {0, 4, 0, 0},
+                          {0, 4, 0, 0},
+                          {0, 0, 0, 0}};
+const int block5[4][4] = {{0, 5, 0, 0},
+                          {0, 5, 0, 0},
+                          {0, 5, 5, 0},
+                          {0, 0, 0, 0}};
+const int block6[4][4] = {{0, 0, 6, 6},
+                          {0, 6, 6, 0},
+                          {0, 0, 0, 0},
+                          {0, 0, 0, 0}};
+const int block7[4][4] = {{0, 0, 0, 0},
+                          {0, 7, 7, 0},
+                          {0, 7, 7, 0},
+                          {0, 0, 0, 0}};
 
-int block1[4][4] =  {{1, 0, 0, 0},
-                    {1, 0, 0, 0},
-                    {1, 0, 0, 0},
-                    {1, 0, 0, 0}};
-int block2[4][4] = {{2, 2, 0, 0},
-                    {0, 2, 2, 0},
-                    {0, 0, 0, 0},
-                    {0, 0, 0, 0}};
-int block3[4][4] = {{3, 3, 3, 0},
-                    {0, 3, 0, 0},
-                    {0, 0, 0, 0},
-                    {0, 0, 0, 0}};
-int block4[4][4] = {{4, 4, 0, 0},
-                    {4, 0, 0, 0},
-                    {4, 0, 0, 0},
-                    {0, 0, 0, 0}};
-int block5[4][4] = {{5, 0, 0, 0},
-                    {5, 0, 0, 0},
-                    {5, 5, 0, 0},
-                    {0, 0, 0, 0}};
-int block6[4][4] = {{0, 6, 6, 0},
-                    {6, 6, 0, 0},
-                    {0, 0, 0, 0},
-                    {0, 0, 0, 0}};
-int block7[4][4] = {{7, 7, 0, 0},
-                    {7, 7, 0, 0},
-                    {0, 0, 0, 0},
-                    {0, 0, 0, 0}};
 
 Block::Block() {
     srand(time(NULL));
-    CreateBlock(block);
-}
-
-void Block::CopyBlock(int dst[4][4], int src[4][4]) {
-    for (int i = 0; i < sizeBlock; i++) {
-        for (int j = 0; j < sizeBlock; j++) {
-            block[i][j] = src[i][j];
-        }
-    }
-}
-
-void Block::CreateBlock(int dst[4][4]) {
     int type = rand()%7;
     switch (type) {
-        case 0:
-            CopyBlock(dst, block1);
-            break;
-        case 1:
-            CopyBlock(dst, block2);
-            break;
-        case 2:
-            CopyBlock(dst, block3);
-            break;
-        case 3:
-            CopyBlock(dst, block4);
-            break;
-        case 4:
-            CopyBlock(dst, block5);
-            break;
-        case 5:
-            CopyBlock(dst, block6);
-            break;
-        case 6:
-            CopyBlock(dst, block7);
-            break;
+    case 0:
+        std::copy(*block1, *block1 + sizeBlock * sizeBlock, *block);
+        break;
+    case 1:
+        std::copy(*block2, *block2 + sizeBlock * sizeBlock, *block);
+        break;
+    case 2:
+        std::copy(*block3, *block3 + sizeBlock * sizeBlock, *block);
+        break;
+    case 3:
+        std::copy(*block4, *block4 + sizeBlock * sizeBlock, *block);
+        break;
+    case 4:
+        std::copy(*block5, *block5 + sizeBlock * sizeBlock, *block);
+        break;
+    case 5:
+        std::copy(*block6, *block6 + sizeBlock * sizeBlock, *block);
+        break;
+    case 6:
+        std::copy(*block7, *block7 + sizeBlock * sizeBlock, *block);
+        break;
+    default:
+        break;
     }
 }
 
-void Block::RestoreBlock() {
-    CopyBlock(block, nextBlock);
-    CreateBlock(nextBlock);
-    curX = 4;
-    curY = 0;
+Block::Block(const Block& other) noexcept : curX(other.curX), curY(other.curY) {
+    std::copy(*(other.block), *(other.block) + sizeBlock * sizeBlock, *block);
+}
+
+Block& Block::operator=(const Block& other) {
+    if (this != &other) {
+        curX = other.curX;
+        curY = other.curY;
+        std::copy(*(other.block), *(other.block) + sizeBlock * sizeBlock, *block);
+    }
+    return *this;
 }
 
 void Block::RotateBlock() {
